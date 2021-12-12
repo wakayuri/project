@@ -22,7 +22,7 @@
     <input type="text" id="uname">
 </div>
 <div>
-<p>Message：(Enter or 送信)</p>
+<p>Message：(Enterで送信)</p>
 <textarea name="" id="text" cols="30" rows="10"></textarea>
 
     <table id="list"> 
@@ -30,8 +30,7 @@
 
     </table>
 </div>
-<button id="send">送信</button>
-<button id="remove">消去</button>
+
 <div id="output" style="height: 500px; overflow:auto"></div>
 
 </div>
@@ -114,55 +113,76 @@
         }
 	})
 
-//thml上だけで全消去
-//     $("#remove").on("click",function(){$("#output").empty();
-// });
 
-
-//    $('#' + key).on('mouseover', function () {
-//                 remove(ref(db, "chat/" + key));
-//                 $('#' + key).remove();
-//             });
-
-// $("#" + key).on('click', function () {
-//         remove(ref(db, "chat/" + key));
-//         $('#' + key).remove();
-//     });
 
 
 //リアルタイムに載せる
 
-    // onChildAdded(dbRef,function(data){
-    //     const msg = data.val();
-    //     const key=data.key;
-    //     console.log(msg);
-    //     let h = "<p>";
-    //         h+= msg.uname;
-    //         h+="<br>"
+   
+    // onChildAdded(dbRef, function (data) {
+    //     const msg = data.val();    
+    //     let h = "<div id='message-box' >";
+    //     h += "<p>";
+    //         h += msg.uname;
+    //     h +="</p>";
+    //     h += "<P id='message-number'>";
     //         h+=msg.text;
-    //         h +="</P>";
-    //     $("#output").append(h);
+    //         h +="</div>";
+    //     $("#output").append(h); // #output の最後に追加
+    // });
 
-    // }   );
+    // $("#remove").on("click",function(){
 
-    onChildAdded(dbRef, function (data) {
-        const msg = data.val();    
-        let h = "<div id='message-box' >";
-        h += "<p>";
+    //     remove(dbRef);
+    //     $("#output").text("");
+
+    // });
+
+ // 以下の内容はonChildAdded内に移動させていますので削除OKです。
+        // ここではkeyはまだ定義されていないので、エラーとなってしまいます。
+        // onChildAdded内では、①メッセージの読み込みのたびにkeyをDBより取得し、②ボタンのIDにそのkeyをセットし、③そのボタンがクリックされた時の削除処理を書いています。
+        // $("#"+ key).on("mouseover", function () {
+        //     remove(ref(db, "chat/"+ key));
+        //     $("#"+ key).remove();
+        // });
+
+        //こちらでDB上のデータを一件一件取得しています。
+        //（画面表示時に既存のデータを一気に取得し、その後、データの追加があるたびにこちらのコードが呼び出されます）。
+        // つまり、データの数だけこちらの処理が繰り返し行われることになります。
+        onChildAdded(dbRef, function (data) {
+            const msg = data.val();
+            const key = data.key; //=> DB上の「MqikIQAh7-f6m8LD2Fe」みたいなkeyを取得しています。
+            console.log(msg);
+            
+            let h = "<div id='message-box' >"; //以下でも解説していますが、divで囲うことで、buttonのみならず、divの中身全て削除できるようにしています。
+            h += "<p>";
             h += msg.uname;
-        h +="</p>";
-        h += "<P id='message-number'>";
-            h+=msg.text;
-            h +="</div>";
-        $("#output").append(h); // #output の最後に追加
-    });
+            h += "<br>"
+            h += msg.text;
+            h += "</p>";
+            // ここにボタンのHTMLコードを挟んでいます。(ボタンのIDには上記のkeyを入れています)
+            // keyの中身に応じて、「<button id = "MqikIQAh7-f6m8LD2Fe">削除</button>」みたいな感じになります。
+            h += '<button id = "' + key + '">削除</button>';
+            h += "</div>";
 
-    $("#remove").on("click",function(){
+            $("#output").append(h);
 
-        remove(dbRef);
-        $("#output").text("");
+            // 上のボタンが押された時に該当データが削除されるように削除コードを入れています。
+            // $('#' + key)の部分は、$("#MqikIQAh7-f6m8LD2Fe")のような感じで、上記のkeyに応じて値が代入される感じです。
+            $('#' + key).on('click', function () {
+                remove(ref(db, "chat/" + key)); //=> DB上の構造を見ていると、db > chat > それぞれのkey > unameやtext等といった階層になっているので、chatの下のkeyにアクセスするためにこういった書き方にしています。普段慣れているPCのフォルダ構造と同じような感じですね。（ここはたぶんrealtimeDB独自の書き方なので、こういうもんだくらいでいいと思います）
+                $('#' + key).parent().remove(); //=>DB上で削除したとしても、画面更新（リロード）を行わない限りhtml上何も変化が起きないので、上記$("#output").append(h);で追加した部分を削除しています。buttonの親要素として、divで全体を囲む構成にしているので、buttonだけでなく、親のdivごと削除できるように、parent()というのを挟んでいます。
+            });
+        });
+    </script>
+</body>
 
-    });
+</html>
+
+
+
+
+
 
 
   </script>
