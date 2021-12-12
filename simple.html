@@ -24,13 +24,14 @@
 <div>
 <p>Message：</p>
 <textarea name="" id="text" cols="30" rows="10"></textarea>
-<button id="send">送信</button>
+
     <table id="list"> 
 
 
     </table>
 </div>
-<button id="key">消去</button>
+<button id="send">送信</button>
+<button id="remove">消去</button>
 <div id="output" style="height: 1000px; overflow:auto"></div>
 
 </div>
@@ -118,32 +119,51 @@
 // });
 
 
-   $('#' + key).on('mouseover', function () {
-                remove(ref(db, "chat/" + key));
-                $('#' + key).remove();
-            });
+//    $('#' + key).on('mouseover', function () {
+//                 remove(ref(db, "chat/" + key));
+//                 $('#' + key).remove();
+//             });
 
-
+// $("#" + key).on('click', function () {
+//         remove(ref(db, "chat/" + key));
+//         $('#' + key).remove();
+//     });
 
 
 //リアルタイムに載せる
 
-    onChildAdded(dbRef,function(data){
-        const msg = data.val();
-        const key=data.key;
-        console.log(msg);
-        let h = "<p>";
-            h+= msg.uname;
-            h+="<br>"
+    // onChildAdded(dbRef,function(data){
+    //     const msg = data.val();
+    //     const key=data.key;
+    //     console.log(msg);
+    //     let h = "<p>";
+    //         h+= msg.uname;
+    //         h+="<br>"
+    //         h+=msg.text;
+    //         h +="</P>";
+    //     $("#output").append(h);
+
+    // }   );
+
+    onChildAdded(dbRef, function (data) {
+        const msg = data.val();    
+        let h = "<div id='message-box' >";
+        h += "<p>";
+            h += msg.uname;
+        h +="</p>";
+        h += "<P id='message-number'>";
             h+=msg.text;
-            h +="</P>";
-        $("#output").append(h);
+            h +="</div>";
+        $("#output").append(h); // #output の最後に追加
+    });
 
-    }   );
+    $("#remove").on("click",function(){
 
+        remove(dbRef);
+        $("#output").text("");
 
+    });
 
-    
 
   </script>
 
