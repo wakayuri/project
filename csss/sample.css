@@ -1,0 +1,21 @@
+
+
+  body {
+    background-color: ivory;
+    background-image: url(backgroundpic.jpg);
+    width: 500px;
+    height: 300px;
+    margin-top: 30px;
+    margin-left: 500px;
+
+
+  }
+
+  #Chatapp {
+    font-size: large;
+    font-weight: bold;
+    font-style: italic;
+    color: orangered;
+
+
+  }
